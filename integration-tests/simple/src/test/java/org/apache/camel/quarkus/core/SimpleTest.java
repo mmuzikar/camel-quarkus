@@ -60,4 +60,25 @@ public class SimpleTest {
         given().body("A body of type ByteBuffer").when().get("/simple/bodyIs").then().statusCode(200).body(is("BYTE_BUFFER"));
     }
 
+    @Test
+    public void lastIndexShouldWork() {
+        given().body("a,b,c,d").when().get("/simple/lastItem").then().statusCode(200).body(is("d"));
+    }
+
+    @Test
+    public void enumValuesShouldWork() {
+        given().body("LEFT").when().get("/simple/enum").then().statusCode(200).body(is("true"));
+        given().body("RIGHT").when().get("/simple/enum").then().statusCode(200).body(is("false"));
+    }
+
+    @Test
+    public void ognlAccessToCamelContextShouldWork() {
+        given().when().get("/simple/components").then().statusCode(200).body(is("[direct, bean]"));
+    }
+
+    @Test
+    public void simpleBindingLanguageShouldWorkForBeans() {
+        given().when().get("/simple/bean").then().statusCode(200).body(is("false"));
+        given().when().body("world").get("/simple/bean").then().statusCode(200).body(is("true"));
+    }
 }

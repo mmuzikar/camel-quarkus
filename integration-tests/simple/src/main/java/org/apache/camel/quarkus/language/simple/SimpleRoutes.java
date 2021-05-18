@@ -32,6 +32,16 @@ public class SimpleRoutes extends RouteBuilder {
                 .setBody(constant("PREMIUM"));
 
         from("direct:bodyIs-simple").filter().simple("${body} is 'java.nio.ByteBuffer'").setBody(constant("BYTE_BUFFER"));
+
+        from("direct:lastItem").setBody(simple("${body[last]}"));
+
+        from("direct:componentList").setBody(simple("${camelContext.componentNames}"));
+
+        from("direct:enum-simple")
+                .setBody(simple(
+                        "${body} == ${type:org.apache.camel.quarkus.language.simple.Side.LEFT}"));
+
+        from("direct:bean").bean("simpleBean").setBody(simple("${ref:simpleBean}"));
     }
 
 }

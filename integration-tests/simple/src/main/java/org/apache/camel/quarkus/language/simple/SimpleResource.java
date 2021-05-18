@@ -18,6 +18,7 @@ package org.apache.camel.quarkus.language.simple;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -35,6 +36,9 @@ public class SimpleResource {
 
     @Inject
     ProducerTemplate template;
+
+    @Inject
+    SimpleBean simpleBean;
 
     @Path("/filter")
     @GET
@@ -79,5 +83,40 @@ public class SimpleResource {
             return template.requestBody("direct:bodyIs-simple", ByteBuffer.wrap(body.getBytes(StandardCharsets.UTF_8)),
                     String.class);
         }
+    }
+
+    @Path("/lastItem")
+    @GET
+    @Consumes(MediaType.TEXT_PLAIN)
+    @Produces(MediaType.TEXT_PLAIN)
+    public String lastItem(String csv) {
+        return template.requestBody("direct:lastItem", csv.split(","), String.class);
+    }
+
+    @Path("/enum")
+    @GET
+    @Consumes(MediaType.TEXT_PLAIN)
+    @Produces(MediaType.TEXT_PLAIN)
+    public Object enumTest(String value) {
+        return template.requestBody("direct:enum-simple", Side.valueOf(value));
+    }
+
+    @Path("/components")
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    public String getComponents() {
+        return template.requestBody("direct:componentList", null, String.class);
+    }
+
+    @Path("/bean")
+    @GET
+    @Consumes(MediaType.TEXT_PLAIN)
+    @Produces(MediaType.TEXT_PLAIN)
+    public boolean sendToBean(Optional<String> header) {
+        SimpleBean val = template.requestBodyAndHeader("direct:bean", "Hello " + System.currentTimeMillis(), "foo",
+                header.orElse(null), SimpleBean.class);
+        System.out.println(val.body);
+        System.out.println(val.foo);
+        return val.foo;
     }
 }
