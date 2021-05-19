@@ -37,11 +37,11 @@ public class SimpleRoutes extends RouteBuilder {
 
         from("direct:componentList").setBody(simple("${camelContext.componentNames}"));
 
-        from("direct:enum-simple")
-                .setBody(simple(
-                        "${body} == ${type:org.apache.camel.quarkus.language.simple.Side.LEFT}"));
+        from("direct:enum-simple").choice().when()
+                .simple("${body} == ${type:org.apache.camel.quarkus.language.simple.Side.LEFT}").setBody(constant(true))
+                .otherwise().setBody(constant(false));
 
-        from("direct:bean").bean("simpleBean").setBody(simple("${ref:simpleBean}"));
+        from("direct:bean").bean("simpleBean");
     }
 
 }

@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Test;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.text.MatchesPattern.matchesPattern;
 
 @QuarkusTest
 public class SimpleTest {
@@ -66,8 +67,12 @@ public class SimpleTest {
     }
 
     @Test
-    public void enumValuesShouldWork() {
+    public void simplePredicateMatchingLeftEnumShouldReturnTrue() {
         given().body("LEFT").when().get("/simple/enum").then().statusCode(200).body(is("true"));
+    }
+
+    @Test
+    public void simplePredicateNotMatchingLeftEnumShouldReturnFalse() {
         given().body("RIGHT").when().get("/simple/enum").then().statusCode(200).body(is("false"));
     }
 
@@ -77,8 +82,12 @@ public class SimpleTest {
     }
 
     @Test
-    public void simpleBindingLanguageShouldWorkForBeans() {
-        given().when().get("/simple/bean").then().statusCode(200).body(is("false"));
-        given().when().body("world").get("/simple/bean").then().statusCode(200).body(is("true"));
+    public void simpleUnmatchingPredicateInBeanParameterBindingShouldReturnFalse() {
+        given().when().get("/simple/bean").then().statusCode(200).body(matchesPattern("Hello-[0-9]+ :: false"));
+    }
+
+    @Test
+    public void simpleMatchingPredicateInBeanParameterBindingShouldReturnTrue() {
+        given().when().get("/simple/bean?header=value").then().statusCode(200).body(matchesPattern("Hello-[0-9]+ :: true"));
     }
 }

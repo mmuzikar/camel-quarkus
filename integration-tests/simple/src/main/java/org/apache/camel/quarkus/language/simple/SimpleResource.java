@@ -18,7 +18,6 @@ package org.apache.camel.quarkus.language.simple;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -26,6 +25,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.camel.ProducerTemplate;
@@ -112,11 +112,8 @@ public class SimpleResource {
     @GET
     @Consumes(MediaType.TEXT_PLAIN)
     @Produces(MediaType.TEXT_PLAIN)
-    public boolean sendToBean(Optional<String> header) {
-        SimpleBean val = template.requestBodyAndHeader("direct:bean", "Hello " + System.currentTimeMillis(), "foo",
-                header.orElse(null), SimpleBean.class);
-        System.out.println(val.body);
-        System.out.println(val.foo);
-        return val.foo;
+    public String sendToBean(@QueryParam("header") String header) {
+        template.requestBodyAndHeader("direct:bean", "Hello-" + System.currentTimeMillis(), "foo", header);
+        return simpleBean.toString();
     }
 }
