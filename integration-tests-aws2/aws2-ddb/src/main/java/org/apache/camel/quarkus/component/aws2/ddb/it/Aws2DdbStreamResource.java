@@ -30,6 +30,8 @@ import javax.ws.rs.core.MediaType;
 import io.quarkus.runtime.StartupEvent;
 import org.apache.camel.ConsumerTemplate;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.jboss.logging.Logger;
+
 import software.amazon.awssdk.services.dynamodb.model.Record;
 import software.amazon.awssdk.services.dynamodb.model.StreamRecord;
 
@@ -53,8 +55,9 @@ public class Aws2DdbStreamResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Map<String, String> change() {
         Map<String, String> result = new LinkedHashMap<>();
-        Record record = consumerTemplate.receiveBody(componentUri(), 10000, Record.class);
+        Record record = consumerTemplate.receiveBody(componentUri(), 600000, Record.class);
         if (record == null) {
+            Logger.getLogger(Aws2DdbStreamResource.class).error("DDB timeout");
             return null;
         }
         StreamRecord item = record.dynamodb();
