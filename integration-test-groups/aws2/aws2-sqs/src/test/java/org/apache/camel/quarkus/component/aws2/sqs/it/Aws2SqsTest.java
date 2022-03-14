@@ -41,6 +41,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.is;
 
@@ -147,7 +148,6 @@ class Aws2SqsTest {
             Instant start = Instant.now();
             final String msgSent = sendSingleMessageToQueue(qName);
             awaitMessageWithExpectedContentFromQueue(msgSent, qName);
-            System.out.println(Duration.between(start, Instant.now()).getSeconds());
             Assertions.assertTrue(Duration.between(start, Instant.now()).getSeconds() >= delay);
         } catch (AssertionError e) {
             e.printStackTrace();
